@@ -1,0 +1,62 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: paperless-ai_webserver_1
+      APP_PORT: 8000
+
+  webserver:
+    image: ghcr.io/clusterzx/paperless-ai:latest
+    restart: on-failure
+    depends_on:
+      - db
+      - broker
+    environment:
+      # Verbindungskomponenten (Notwendig, damit der Container startet)
+      PAPERLESS_REDIS: redis://paperless-ai_broker_1:6379
+      PAPERLESS_DBHOST: paperless-ai_db_1
+      PAPERLESS_DBPASS: umbrel
+      PAPERLESS_DBUSER: umbrel
+      PAPERLESS_DBNAME: paperless
+      
+      # Wichtig für Umbrel Dateirechte (User 1000 ist der Standard auf Umbrel)
+      USER_MAP_UID: 1000
+      USER_MAP_GID: 1000
+      
+      # URL Konfiguration
+      PAPERLESS_URL: http://${APP_SERVER_IP}:8000
+      
+      # Zeitzone (optional, aber empfohlen)
+      PAPERLESS_TIME_ZONE: Europe/Berlin
+      
+      # Wir entfernen hier explizit ADMIN_USER und API_KEY, 
+      # da diese laut deiner Info über die GUI kommen.
+    volumes:
+      - ${APP_DATA_DIR}/data:/usr/src/paperless/data
+      - ${APP_DATA_DIR}/media:/usr/src/paperless/media
+      - ${APP_DATA_DIR}/export:/usr/src/paperless/export
+      - ${APP_DATA_DIR}/consume:/usr/src/paperless/consume
+    networks:
+      default:
+        ipv4_address: $APP_SERVER_IP
+
+  db:
+    image: postgres:15
+    restart: on-failure
+    volumes:
+      - ${APP_DATA_DIR}/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: umbrel
+      POSTGRES_PASSWORD: umbrel
+    networks:
+      default:
+
+  broker:
+    image: redis:7
+    restart: on-failure
+    volumes:
+      - ${APP_DATA_DIR}/redis:/data
+    networks:
+      default:

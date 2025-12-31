@@ -1,0 +1,23 @@
+manifest:
+  version: 1
+  app:
+    version: 1.0.0
+    id: paperless-ai
+    name: Paperless-AI
+    tagline: Dokumentenmanagement mit KI-Power
+    category: productivity
+    description: >-
+      Paperless-AI erweitert Paperless-ngx um KI-Funktionen.
+      Nach der Installation öffne die App, um den Einrichtungsassistenten zu starten.
+      Dort kannst du deinen Admin-Benutzer anlegen und deinen OpenAI API Key hinterlegen.
+    developer: clusterzx
+    website: https://github.com/clusterzx/paperless-ai
+    dependencies:
+      - db
+      - redis
+    repo: https://github.com/clusterzx/paperless-ai
+    support: https://github.com/clusterzx/paperless-ai/issues
+    port: 8000
+    gallery:
+      - https://raw.githubusercontent.com/paperless-ngx/paperless-ngx/main/resources/screenshots/dashboard.png
+    path: ""
